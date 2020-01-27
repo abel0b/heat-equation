@@ -18,7 +18,7 @@ static const double alpha = 0.02;
 static const double epsilon = 0.0001;
 
 /** max number of steps */
-static const int stencil_max_steps = 10000;
+static int stencil_max_steps = 10000;
 
 static double *** values = NULL;
 
@@ -107,7 +107,9 @@ int main(int argc, char**argv) {
         STENCIL_SIZE_Y = atoi(argv[2]);
     }
 
-    bool display_enabled = max(STENCIL_SIZE_X, STENCIL_SIZE_Y) <= 10;
+    if (argc > 3) {
+        stencil_max_steps = atoi(argv[3]);
+    }    bool display_enabled = max(STENCIL_SIZE_X, STENCIL_SIZE_Y) <= 10;
 
     stencil_init();
 

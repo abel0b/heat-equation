@@ -1,9 +1,10 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
 #include <stdbool.h>
+
+#define DUMP_FILENAME "baseline.heat.bin"
 
 int STENCIL_SIZE_X = 25;
 int STENCIL_SIZE_Y = 30;
@@ -18,7 +19,7 @@ static const double alpha = 0.02;
 static const double epsilon = 0.0001;
 
 /** max number of steps */
-static const int stencil_max_steps = 10000;
+static int stencil_max_steps = 10000;
 
 static double *** values = NULL;
 
@@ -100,10 +101,21 @@ inline int max(int a, int b) {
     return (a>=b)? a : b;
 }
 
+void stencil_dump() {
+    FILE * output = fopen(DUMP_FILENAME, "wb");
+
+
+    fclose(output);
+}
+
 int main(int argc, char**argv) {
     if (argc > 2) {
         STENCIL_SIZE_X = atoi(argv[1]);
         STENCIL_SIZE_Y = atoi(argv[2]);
+    }
+ 
+    if (argc > 3) {
+        stencil_max_steps = atoi(argv[3]);
     }
 
     bool display_enabled = max(STENCIL_SIZE_X, STENCIL_SIZE_Y) <= 10;
@@ -136,6 +148,9 @@ int main(int argc, char**argv) {
     if (display_enabled) {
         stencil_display(current_buffer, 0, STENCIL_SIZE_X - 1, 0, STENCIL_SIZE_Y - 1);
     }
+
+    stencil_dump();
+
     return 0;
 }
 
