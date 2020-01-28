@@ -1,23 +1,44 @@
+CC=gcc
+MPICC=mpicc
 CFLAGS += -Wall -Wextra -O4
-ifdef debug
+ifeq ($(debug),true)
 	CFLAGS += -DDEBUG
 endif
-LDLIBS += -lm -lrt
-INCLUDES_MPI = -I /usr/include/openmpi-x86_64
+LDFLAGS += -lm -lrt
+MPI_INCLUDE_DIRS = -I /usr/include/openmpi-x86_64
+BINARY_DIR = build
 
-all: stencil-baseline stencil-openmp stencil-mpi stencil-mpi-openmp
+.PHONY: all
+all: $(BINARY_DIR)/stencil-baseline $(BINARY_DIR)/stencil-openmp $(BINARY_DIR)/stencil-mpi $(BINARY_DIR)/stencil-mpi-openmp $(BINARY_DIR)/stencil-compare
 
-stencil-baseline: stencil-baseline.c
-	$(CC) $(CFLAGS) $(LDLIBS) -o $@ $<
+$(BINARY_DIR)/stencil-baseline: src/stencil-baseline.c
+	mkdir -p $(BINARY_DIR)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $<
 
-stencil-openmp: stencil-openmp.c
-	$(CC) $(CFLAGS) $(LDLIBS) -o $@ $<
+$(BINARY_DIR)/stencil-openmp: src/stencil-openmp.c
+	mkdir -p $(BINARY_DIR)
+	$(CC) $(CFLAGS) -fopenmp $(LDFLAGS) -o $@ $<
 	
-stencil-mpi: stencil-mpi.c
-	mpicc $(CFLAGS) $(LDLIBS) $(INCLUDES_MPI) -o $@ $<
+$(BINARY_DIR)/stencil-mpi: src/stencil-mpi.c
+	mkdir -p $(BINARY_DIR)
+	$(MPICC) $(CFLAGS) $(LDFLAGS) $(MPI_INCLUDE_DIRS) -o $@ $<
 
-stencil-mpi-openmp: stencil-mpi.c
-	mpicc $(CFLAGS) -fopenmp -DOPENMP_ENABLED $(LDLIBS) $(INCLUDES_MPI) -o $@ $<
+$(BINARY_DIR)/stencil-mpi-openmp: src/stencil-mpi.c
+	mkdir -p $(BINARY_DIR)
+	$(MPICC) $(CFLAGS) -fopenmp -DOPENMP_ENABLED $(LDFLAGS) $(MPI_INCLUDE_DIRS) -o $@ $<
 
+$(BINARY_DIR)/stencil-compare: test/stencil-compare.c
+	mkdir -p $(BINARY_DIR)
+	$(CC) $(CFLAGS) -o $@ $<	
+
+.PHONY: test
+test: all
+	./test/compare_outputs.sh
+
+.PHONY: bench
+bench: all
+	./bench/speedup.sh
+
+.PHONY: clean
 clean:
-	rm -f stencil-baseline stencil-openmp stencil-mpi stencil-mpi-openmp
+	rm -rf $(BINARY_DIR)/*

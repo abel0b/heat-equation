@@ -4,10 +4,10 @@
 #include <time.h>
 #include <stdbool.h>
 
-#define DUMP_FILENAME "baseline.heat.bin"
+#define DUMP_FILENAME "build/stencil-baseline.bin"
 
-int STENCIL_SIZE_X = 25;
-int STENCIL_SIZE_Y = 30;
+int STENCIL_SIZE_X = 64;
+int STENCIL_SIZE_Y = 64;
 
 /** number of buffers for N-buffering; should be at least 2 */
 int STENCIL_NBUFFERS = 2;
@@ -103,7 +103,14 @@ inline int max(int a, int b) {
 
 void stencil_dump() {
     FILE * output = fopen(DUMP_FILENAME, "wb");
+    
+    fwrite(&STENCIL_SIZE_X, sizeof(int), 1, output);
+    fwrite(&STENCIL_SIZE_Y, sizeof(int), 1, output);
 
+    int x;
+    for(x = 0; x < STENCIL_SIZE_X; x++) {
+        fwrite(&values[current_buffer][x], sizeof(double), STENCIL_SIZE_Y, output);
+    }
 
     fclose(output);
 }
@@ -150,6 +157,9 @@ int main(int argc, char**argv) {
     }
 
     stencil_dump();
+
+    free(values);    
+    // TODO: free memory
 
     return 0;
 }

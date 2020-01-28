@@ -5,8 +5,10 @@
 #include <stdbool.h>
 #include <omp.h>
 
-int STENCIL_SIZE_X = 25;
-int STENCIL_SIZE_Y = 30;
+#define DUMP_FILENAME "build/stencil-openmp.bin"
+
+int STENCIL_SIZE_X = 64;
+int STENCIL_SIZE_Y = 64;
 
 /** number of buffers for N-buffering; should be at least 2 */
 int STENCIL_NBUFFERS = 2;
@@ -97,6 +99,20 @@ static int stencil_test_convergence(void) {
     return 1;
 }
 
+void stencil_dump() {
+    FILE * output = fopen(DUMP_FILENAME, "wb");
+    
+    fwrite(&STENCIL_SIZE_X, sizeof(int), 1, output);
+    fwrite(&STENCIL_SIZE_Y, sizeof(int), 1, output);
+
+    int x;
+    for(x = 0; x < STENCIL_SIZE_X; x++) {
+        fwrite(&values[current_buffer][x], sizeof(double), STENCIL_SIZE_Y, output);
+    }
+
+    fclose(output);
+}
+
 inline int max(int a, int b) {
     return (a>=b)? a : b;
 }
@@ -139,6 +155,12 @@ int main(int argc, char**argv) {
     if (display_enabled) {
         stencil_display(current_buffer, 0, STENCIL_SIZE_X - 1, 0, STENCIL_SIZE_Y - 1);
     }
+
+    stencil_dump();
+    
+    free(values);
+    // TODO: free memory
+
     return 0;
 }
 

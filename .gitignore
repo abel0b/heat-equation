@@ -1,3 +1,1 @@
-/stencil-*
-!stencil-*.c
-*.bin
+/build
