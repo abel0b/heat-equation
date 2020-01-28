@@ -51,8 +51,10 @@ function plot() {
     echo "set output \"$output_dir/$name.png\"" >> $output_dir/$name.conf 
     echo "set xlabel \"version\"" >> $output_dir/$name.conf
     echo "set ylabel \"speedup\"" >> $output_dir/$name.conf
-    echo "set boxwidth 0.5" >> $output_dir/$name.conf
+    echo "set boxwidth 1.0" >> $output_dir/$name.conf
     echo "set style fill solid" >> $output_dir/$name.conf
+    echo "set yrange [0:*]"
+    echo "set grid ytics lt 0 lw 1 lc rgb '#bbbbbb'"
     echo "plot \"$output_dir/$name.dat\" using 2: xtic(1) with histogram notitle linecolor rgb '#006EB8'" >> $output_dir/$name.conf
     
     cat $output_dir/$name.conf | gnuplot
@@ -62,4 +64,4 @@ function plot() {
 }
 
 plot "baseline-unoptimized baseline"
-#plot "baseline openmp mpi"
+plot "baseline openmp mpi"

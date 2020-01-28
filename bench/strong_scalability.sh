@@ -7,7 +7,7 @@ output_dir=./results/plot
 max_steps=${max_steps:-10000}
 version=mpi
 size=4000
-nps=(4 16 64)
+nps=(4 16 64 )
 
 source env.sh
 
@@ -32,16 +32,18 @@ do
         time_ms_ref=$time_ms
     fi
     speedup=$(echo "print($time_ms_ref/$time_ms)" | python3)
-   echo "\"$version\" $speedup" >> $output_dir/strong_scalability.dat
+   echo "\"$size/${nps[$i]}\" $speedup" >> $output_dir/strong_scalability.dat
 done
 
 echo > $output_dir/strong_scalability.conf
 echo "set terminal png size $plot_width,$plot_height" >> $output_dir/strong_scalability.conf
 echo "set output \"$output_dir/strong_scalability.png\"" >> $output_dir/strong_scalability.conf 
-echo "set xlabel \"version\"" >> $output_dir/strong_scalability.conf
+echo "set xlabel \"size/np\"" >> $output_dir/strong_scalability.conf
 echo "set ylabel \"speedup\"" >> $output_dir/strong_scalability.conf
-echo "set boxwidth 0.5" >> $output_dir/strong_scalability.conf
+echo "set boxwidth 1.0" >> $output_dir/strong_scalability.conf
 echo "set style fill solid" >> $output_dir/strong_scalability.conf
+echo "set yrange [0:*]"
+echo "set grid ytics lt 0 lw 1 lc rgb '#bbbbbb'"
 echo "plot \"$output_dir/strong_scalability.dat\" using 2: xtic(1) with histogram notitle" >> $output_dir/strong_scalability.conf
 
 cat $output_dir/strong_scalability.conf | gnuplot

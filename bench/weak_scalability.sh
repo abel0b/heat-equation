@@ -32,17 +32,19 @@ do
         time_ms_ref=$time_ms
     fi
     speedup=$(echo "print($time_ms_ref/$time_ms)" | python3)
-   echo "\"$version\" $speedup" >> $output_dir/weak_scalability.dat
+   echo "\"${sizes[$i]}/${nps[$i]}\" $speedup" >> $output_dir/weak_scalability.dat
 done
 
 echo > $output_dir/weak_scalability.conf
 echo "set terminal png size $plot_width,$plot_height" >> $output_dir/weak_scalability.conf
 echo "set output \"$output_dir/weak_scalability.png\"" >> $output_dir/weak_scalability.conf 
-echo "set xlabel \"version\"" >> $output_dir/weak_scalability.conf
+echo "set xlabel \"size/np\"" >> $output_dir/weak_scalability.conf
 echo "set ylabel \"speedup\"" >> $output_dir/weak_scalability.conf
-echo "set boxwidth 0.5" >> $output_dir/weak_scalability.conf
+echo "set boxwidth 1.0" >> $output_dir/weak_scalability.conf
 echo "set style fill solid" >> $output_dir/weak_scalability.conf
-echo "plot \"$output_dir/weak_scalability.dat\" using 2: xtic(1) with histogram notitle" >> $output_dir/weak_scalability.conf
+echo "set yrange [0:*]"
+echo "set grid ytics lt 0 lw 1 lc rgb '#bbbbbb'"
+echo "plot \"$output_dir/weak_scalability.dat\" using 2: xtic(1) with histogram notitle linecolor rgb '#006EB8'" >> $output_dir/weak_scalability.conf
 
 cat $output_dir/weak_scalability.conf | gnuplot
 
