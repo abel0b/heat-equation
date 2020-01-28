@@ -19,6 +19,8 @@ versions="baseline openmp mpi"
 
 mkdir -p build/logs
 
+source env.sh
+
 function test() {
     pass=true
 

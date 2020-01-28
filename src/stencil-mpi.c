@@ -182,10 +182,6 @@ static int stencil_test_convergence(void) {
     return all_converged;
 }
 
-inline int max(int a, int b) {
-    return (a>=b)? a : b;
-}
-
 void stencil_dump() {
     FILE * output = fopen(DUMP_FILENAME, "wb");
     fwrite(&STENCIL_SIZE_X, sizeof(int), 1, output);
@@ -199,7 +195,7 @@ int main(int argc, char**argv) {
     int pid;
     int np;
     int master = 0;
-    bool display_enabled = max(STENCIL_SIZE_X, STENCIL_SIZE_Y) <= 10;
+    bool display_enabled = STENCIL_SIZE_X + STENCIL_SIZE_Y <= 20;
     struct timespec t1, t2;
 
     MPI_Comm_rank(MPI_COMM_WORLD, &pid); 
@@ -236,8 +232,8 @@ int main(int argc, char**argv) {
     MPI_Cart_shift(grid, 1, 1, &source_rank, &neighbors[UP]);
     MPI_Cart_shift(grid, 1, -1, &source_rank, &neighbors[DOWN]);
     
-    block_height = STENCIL_SIZE_X / dimensions[0];
-    block_width = STENCIL_SIZE_Y / dimensions[1];
+    block_height = STENCIL_SIZE_X / dimensions[0] + (STENCIL_SIZE_X % dimensions[0]);
+    block_width = STENCIL_SIZE_Y / dimensions[1] + (STENCIL_SIZE_Y % dimensions[1]);
 
     // Create column and row datatypes
     MPI_Type_contiguous(block_width, MPI_DOUBLE, &row);

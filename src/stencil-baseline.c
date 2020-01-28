@@ -97,10 +97,6 @@ static int stencil_test_convergence(void) {
     return 1;
 }
 
-inline int max(int a, int b) {
-    return (a>=b)? a : b;
-}
-
 void stencil_dump() {
     FILE * output = fopen(DUMP_FILENAME, "wb");
     
@@ -125,7 +121,7 @@ int main(int argc, char**argv) {
         stencil_max_steps = atoi(argv[3]);
     }
 
-    bool display_enabled = max(STENCIL_SIZE_X, STENCIL_SIZE_Y) <= 10;
+    bool display_enabled = STENCIL_SIZE_X + STENCIL_SIZE_Y <= 10;
 
     stencil_init();
 
