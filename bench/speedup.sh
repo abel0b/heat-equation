@@ -53,7 +53,7 @@ function plot() {
     echo "set ylabel \"speedup\"" >> $output_dir/$name.conf
     echo "set boxwidth 1.0" >> $output_dir/$name.conf
     echo "set style fill solid" >> $output_dir/$name.conf
-    echo "set yrange [*<0:]"
+    echo "set yrange [0:]" >> $output_dir/$name.conf
     echo "plot \"$output_dir/$name.dat\" using 2: xtic(1) with histogram notitle linecolor rgb '#006EB8'" >> $output_dir/$name.conf
     
     cat $output_dir/$name.conf | gnuplot

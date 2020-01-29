@@ -42,8 +42,8 @@ echo "set xlabel \"size/np\"" >> $output_dir/strong_scalability.conf
 echo "set ylabel \"speedup\"" >> $output_dir/strong_scalability.conf
 echo "set boxwidth 1.0" >> $output_dir/strong_scalability.conf
 echo "set style fill solid" >> $output_dir/strong_scalability.conf
-echo "set yrange [*<0:]"
-echo "plot \"$output_dir/strong_scalability.dat\" using 2: xtic(1) with histogram notitle" >> $output_dir/strong_scalability.conf
+echo "set yrange [0:]" >> $output_dir/strong_scalability.conf
+echo "plot \"$output_dir/strong_scalability.dat\" using 2: xtic(1) with histogram notitle linecolor rgb '#006EB8'" >> $output_dir/strong_scalability.conf
 
 cat $output_dir/strong_scalability.conf | gnuplot
 
