@@ -42,8 +42,7 @@ echo "set xlabel \"size/np\"" >> $output_dir/weak_scalability.conf
 echo "set ylabel \"speedup\"" >> $output_dir/weak_scalability.conf
 echo "set boxwidth 1.0" >> $output_dir/weak_scalability.conf
 echo "set style fill solid" >> $output_dir/weak_scalability.conf
-echo "set yrange [0:*]"
-echo "set grid ytics lt 0 lw 1 lc rgb '#bbbbbb'"
+echo "set yrange [*<0:]"
 echo "plot \"$output_dir/weak_scalability.dat\" using 2: xtic(1) with histogram notitle linecolor rgb '#006EB8'" >> $output_dir/weak_scalability.conf
 
 cat $output_dir/weak_scalability.conf | gnuplot
