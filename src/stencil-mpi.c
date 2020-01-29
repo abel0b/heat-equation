@@ -58,6 +58,8 @@ enum Neighbor {
     RIGHT
 };
 
+int local_converged;
+
 /** init stencil values to 0, borders to non-zero */
 static void stencil_init() {
     int b, x, y;
@@ -119,7 +121,12 @@ static void stencil_step(void) {
     int next_buffer = (current_buffer + 1) % STENCIL_NBUFFERS;
     int x, y;
 
+    local_converged = 1;
+
     #ifdef OPENMP_ENABLED
+    #pragma omp parallel for private(y)
+    #endif
+    #ifdef OPENMP_COLLAPSE_ENABLED
     #pragma omp parallel for collapse(2)
     #endif
     for(x = 0; x < block_height; x++) {
@@ -134,6 +141,7 @@ static void stencil_step(void) {
                 (1-block_border[BLOCK_IDX(next_buffer,x+1,y+1)]) +
                 block_border[BLOCK_IDX(prev_buffer,x+1,y+1)] *
                 block[BLOCK_IDX(prev_buffer,x+1,y+1)];
+           local_converged = local_converged && (fabs(block[BLOCK_IDX(prev_buffer,x+1,y+1)] - block[BLOCK_IDX(current_buffer,x+1,y+1)]) > epsilon); 
 	    }
     }
 
@@ -159,25 +167,9 @@ static void stencil_step(void) {
 }
 
 /** return 1 if computation has converged */
-static int stencil_test_convergence(void) {
-    int prev_buffer = (current_buffer - 1 + STENCIL_NBUFFERS) % STENCIL_NBUFFERS;
-    int x, y;
-    int converged = 1;
-
-    #ifdef OPENMP_ENABLED
-    #pragma omp parallel for collapse(2)
-    #endif
-    for(x = 0; x < block_height; x++) {
-        for(y = 0; y < block_width; y++) {
-	        if(fabs(block[BLOCK_IDX(prev_buffer,x+1,y+1)] - block[BLOCK_IDX(current_buffer,x+1,y+1)]) > epsilon) {
-	            converged = 0;
-            }
-	    }
-    }
-    
+static int stencil_test_convergence(void) {   
     int all_converged = 0;
-
-    MPI_Allreduce(&converged, &all_converged, 1, MPI_INT, MPI_LAND, grid);
+    MPI_Allreduce(&local_converged, &all_converged, 1, MPI_INT, MPI_LAND, grid);
 
     return all_converged;
 }

@@ -6,7 +6,7 @@ plot_height=720
 output_dir=./results/plot
 max_steps=${max_steps:-10000}
 version=mpi
-sizes=(1000 4000 12000)
+sizes=(1000 4000 16000)
 nps=(4 16 64)
 
 source env.sh
